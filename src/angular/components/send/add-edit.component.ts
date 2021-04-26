@@ -301,6 +301,8 @@ export class AddEditComponent implements OnInit {
         const encSend = await this.encryptSend(file);
         try {
             this.formPromise = this.sendService.saveWithServer(encSend);
+            let inactive = false;
+            setTimeout(() => inactive = true, 4500);
             await this.formPromise;
             if (this.send.id == null) {
                 this.send.id = encSend[0].id;
@@ -308,9 +310,8 @@ export class AddEditComponent implements OnInit {
             if (this.send.accessId == null) {
                 this.send.accessId = encSend[0].accessId;
             }
-            this.platformUtilsService.showToast('success', null,
-                this.i18nService.t(this.editMode ? 'editedSend' : 'createdSend'));
             this.onSavedSend.emit(this.send);
+            await this.showSuccessMessage(inactive);
             if (this.copyLink) {
                 this.copyLinkToClipboard(this.link);
             }
@@ -318,6 +319,11 @@ export class AddEditComponent implements OnInit {
         } catch { }
 
         return false;
+    }
+
+    async showSuccessMessage(inactive: boolean) {
+        this.platformUtilsService.showToast('success', null,
+            this.i18nService.t(this.editMode ? 'editedSend' : 'createdSend'));
     }
 
     clearExpiration() {
